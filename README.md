@@ -1,6 +1,6 @@
 # SmartEmail HR
 
-Plateforme intelligente de gestion du recrutement basee sur le cahier des charges v3:
+Plateforme intelligente de gestion du recrutement basee 3ala e5er version cahier des charges v3 :
 
 - Frontend: Angular 17+ (SPA RH/Admin)
 - Backend: ASP.NET Core 8 Web API
