@@ -1,0 +1,193 @@
+{
+  "name": "SmartEmailHR - Refus automatique offres fermees",
+  "active": false,
+  "settings": {},
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Cron Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:5000/api/offres?statut=expiree"
+      },
+      "id": "2",
+      "name": "GET Offres Expirees",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:5000/api/candidatures?statut=EnAttente"
+      },
+      "id": "3",
+      "name": "GET Candidatures EnAttente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "4",
+      "name": "Loop Candidatures",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "to": "={{ $json.emailCandidat }}",
+        "subject": "Votre candidature - Poste non disponible",
+        "message": "Bonjour {{ $json.nomCandidat }},\n\nMerci pour votre intérêt. Le poste visé n'est plus disponible.\n\nCordialement,\nEquipe RH"
+      },
+      "id": "5",
+      "name": "Send Auto Refusal",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        280
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "replace-gmail-credential-id",
+          "name": "SMTP RH"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://localhost:5000/api/candidatures/{{ $json.id }}/decision",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "decision",
+              "value": "Refuse"
+            },
+            {
+              "name": "envoyerEmail",
+              "value": false
+            }
+          ]
+        }
+      },
+      "id": "6",
+      "name": "PATCH Refuse Candidature",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Cron Daily": {
+      "main": [
+        [
+          {
+            "node": "GET Offres Expirees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Offres Expirees": {
+      "main": [
+        [
+          {
+            "node": "GET Candidatures EnAttente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Candidatures EnAttente": {
+      "main": [
+        [
+          {
+            "node": "Loop Candidatures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Candidatures": {
+      "main": [
+        [
+          {
+            "node": "Send Auto Refusal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Auto Refusal": {
+      "main": [
+        [
+          {
+            "node": "PATCH Refuse Candidature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PATCH Refuse Candidature": {
+      "main": [
+        [
+          {
+            "node": "Loop Candidatures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "SmartEmailHR"
+    }
+  ]
+}
+

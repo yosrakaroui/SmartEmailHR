@@ -1,0 +1,24 @@
+# Global
+.DS_Store
+Thumbs.db
+
+# Dotnet
+**/bin/
+**/obj/
+*.user
+*.suo
+*.pdb
+
+# Node / Angular
+**/node_modules/
+frontend/dist/
+
+# Secrets / env
+.env
+.env.*
+backend/SmartEmailHR.API/appsettings.Local.json
+backend/SmartEmailHR.API/secrets.json
+
+# Logs
+*.log
+

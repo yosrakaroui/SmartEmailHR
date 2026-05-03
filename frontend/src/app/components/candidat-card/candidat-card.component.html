@@ -1,0 +1,17 @@
+<article class="candidat-card" (click)="open.emit(candidature.id)">
+  <div class="identity">
+    <p class="name">{{ candidature.nomCandidat }}</p>
+    <p class="email">{{ candidature.emailCandidat }}</p>
+  </div>
+
+  <p class="poste">{{ candidature.titreOffre }}</p>
+
+  <div class="score" [class.good]="(candidature.analyseIA?.score ?? 0) >= 75" [class.medium]="(candidature.analyseIA?.score ?? 0) >= 50 && (candidature.analyseIA?.score ?? 0) < 75" [class.low]="(candidature.analyseIA?.score ?? 0) < 50">
+    {{ candidature.analyseIA?.score ?? 0 }}%
+  </div>
+
+  <span class="status" [class.accepted]="candidature.statut === 'Accepte'" [class.refused]="candidature.statut === 'Refuse'">
+    {{ candidature.statut }}
+  </span>
+</article>
+

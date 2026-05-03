@@ -1,0 +1,62 @@
+<main class="offre-form-page">
+  <header>
+    <a routerLink="/rh/dashboard">← Retour au dashboard RH</a>
+    <h1>{{ isEdit ? 'Modifier une offre' : 'Créer une offre' }}</h1>
+  </header>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <p class="muted" *ngIf="loading">Chargement de l’offre...</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>
+      Titre du poste
+      <input formControlName="titre" />
+    </label>
+
+    <label>
+      Description du poste
+      <textarea formControlName="description" rows="6"></textarea>
+    </label>
+
+    <label>
+      Compétences requises (séparées par des virgules)
+      <input formControlName="competences" placeholder="Angular, TypeScript, HTML, CSS" />
+    </label>
+
+    <div class="grid-2">
+      <label>
+        Niveau d’expérience
+        <select formControlName="niveauExperience">
+          <option value="Débutant">Débutant</option>
+          <option value="Junior">Junior</option>
+          <option value="Confirmé">Confirmé</option>
+          <option value="Senior">Senior</option>
+        </select>
+      </label>
+
+      <label>
+        Domaine
+        <select formControlName="domaine">
+          <option value="Développement Web">Développement Web</option>
+          <option value="Data">Data</option>
+          <option value="Réseaux">Réseaux</option>
+          <option value="Sécurité">Sécurité</option>
+          <option value="Marketing">Marketing</option>
+        </select>
+      </label>
+    </div>
+
+    <label>
+      Date d’expiration
+      <input type="date" formControlName="dateExpiration" />
+    </label>
+
+    <footer>
+      <a routerLink="/rh/dashboard" class="cancel">Annuler</a>
+      <button type="submit" [disabled]="submitting">
+        {{ submitting ? 'Enregistrement...' : isEdit ? 'Mettre à jour l’offre' : 'Créer l’offre' }}
+      </button>
+    </footer>
+  </form>
+</main>
+

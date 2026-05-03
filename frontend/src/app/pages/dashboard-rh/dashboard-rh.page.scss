@@ -1,0 +1,138 @@
+.dashboard {
+  min-height: 100vh;
+  padding: 1.2rem;
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.6), rgba(248, 250, 252, 1)),
+    repeating-linear-gradient(45deg, rgba(191, 219, 254, 0.15) 0 8px, transparent 8px 16px);
+  display: grid;
+  gap: 1.1rem;
+}
+
+.top-bar {
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: 18px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #93c5fd;
+  font-size: 0.75rem;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+button,
+.primary-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary-btn {
+  background: #14b8a6;
+  color: #022c22;
+}
+
+button {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 0.8rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(170px, 1fr));
+  gap: 0.8rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 0.8rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+select,
+input {
+  border: 1px solid #94a3b8;
+  border-radius: 10px;
+  padding: 0.55rem;
+  font: inherit;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-btn {
+  background: transparent;
+  color: #0369a1;
+}
+
+.offres-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.candidature-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 0;
+}
+
+.muted {
+  margin: 0;
+  color: #64748b;
+}
+
+@media (max-width: 980px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

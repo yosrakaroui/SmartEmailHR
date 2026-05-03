@@ -1,0 +1,70 @@
+.candidat-card {
+  display: grid;
+  grid-template-columns: 2fr 2fr auto auto;
+  gap: 0.8rem;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 0.8rem;
+  cursor: pointer;
+  background: #fff;
+}
+
+.identity .name {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.identity .email {
+  margin: 0.15rem 0 0;
+  font-size: 0.83rem;
+  color: #475569;
+}
+
+.poste {
+  margin: 0;
+  color: #0f172a;
+}
+
+.score {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.score.good {
+  color: #15803d;
+}
+
+.score.medium {
+  color: #c2410c;
+}
+
+.score.low {
+  color: #b91c1c;
+}
+
+.status {
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #fb923c;
+  color: #c2410c;
+}
+
+.status.accepted {
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.status.refused {
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+@media (max-width: 860px) {
+  .candidat-card {
+    grid-template-columns: 1fr;
+  }
+}
+

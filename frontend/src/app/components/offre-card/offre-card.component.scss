@@ -1,0 +1,83 @@
+.offre-card {
+  border-radius: 18px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.closed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.description {
+  margin: 0;
+  color: #475569;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.skill {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: 0.78rem;
+}
+
+footer {
+  display: flex;
+  gap: 0.6rem;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0f766e;
+  color: #f8fafc;
+}
+
+button.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+

@@ -1,0 +1,22 @@
+<main class="login-page">
+  <section class="login-panel">
+    <h1>Smart Email HR Assistant</h1>
+    <p>Bienvenue — Connectez-vous à votre compte</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label>
+        Email
+        <input type="email" formControlName="email" placeholder="rh@entreprise.com" />
+      </label>
+
+      <label>
+        Mot de passe
+        <input type="password" formControlName="motDePasse" placeholder="Votre mot de passe" />
+      </label>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <button type="submit" [disabled]="loading">{{ loading ? 'Connexion...' : 'Se connecter' }}</button>
+    </form>
+  </section>
+</main>
+

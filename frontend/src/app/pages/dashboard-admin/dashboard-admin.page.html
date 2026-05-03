@@ -1,0 +1,141 @@
+<main class="admin-page">
+  <header class="top-bar">
+    <div>
+      <p class="kicker">SmartEmail HR</p>
+      <h1>Statistiques RH - Admin</h1>
+    </div>
+
+    <div class="actions">
+      <a routerLink="/rh/dashboard">Vue RH</a>
+      <button type="button" (click)="logout()">Deconnexion</button>
+    </div>
+  </header>
+
+  <p class="muted" *ngIf="loading">Chargement du dashboard admin...</p>
+  <p class="error" *ngIf="!loading && errorMessage">{{ errorMessage }}</p>
+
+  <ng-container *ngIf="!loading && stats">
+    <section class="stats-grid">
+      <app-stat-card label="Candidatures totales" [value]="stats.totalCandidatures.toString()" accent="blue"></app-stat-card>
+      <app-stat-card label="Acceptees" [value]="stats.candidaturesAcceptees.toString()" accent="green"></app-stat-card>
+      <app-stat-card label="Refusees" [value]="stats.candidaturesRefusees.toString()" accent="red"></app-stat-card>
+      <app-stat-card label="Offres actives" [value]="stats.offresActives.toString()" accent="orange"></app-stat-card>
+    </section>
+
+    <section class="charts-grid">
+      <article class="panel">
+        <h2>Ratio acceptes / refuses</h2>
+        <div class="progress">
+          <div class="accepted" [style.width.%]="acceptanceRatio"></div>
+        </div>
+        <p>{{ acceptanceRatio }}% acceptes</p>
+      </article>
+
+      <article class="panel">
+        <h2>Statistiques par domaine</h2>
+        <div class="domain-row" *ngFor="let domain of stats.statsParDomaine">
+          <span>{{ domain.domaine }}</span>
+          <div class="bar">
+            <div [style.width.%]="stats.totalCandidatures ? (domain.nombreCandidatures / stats.totalCandidatures) * 100 : 0"></div>
+          </div>
+          <span>{{ domain.nombreCandidatures }}</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Top scores</h2>
+        <ul>
+          <li *ngFor="let top of stats.topCandidats">
+            <span>{{ top.nomCandidat }} - {{ top.titreOffre }}</span>
+            <strong>{{ top.score }}%</strong>
+          </li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>Faibles scores</h2>
+        <ul>
+          <li *ngFor="let low of stats.faiblesScores">
+            <span>{{ low.nomCandidat }} - {{ low.titreOffre }}</span>
+            <strong>{{ low.score }}%</strong>
+          </li>
+        </ul>
+      </article>
+    </section>
+  </ng-container>
+
+  <section class="grid-2" *ngIf="!loading">
+    <article class="panel">
+      <h2>Gestion utilisateurs RH</h2>
+
+      <form [formGroup]="createUserForm" (ngSubmit)="createUser()" class="user-form">
+        <input formControlName="nom" placeholder="Nom complet" />
+        <input formControlName="email" placeholder="Email RH" />
+        <input formControlName="motDePasse" type="password" placeholder="Mot de passe" />
+        <select formControlName="role">
+          <option value="rh">RH</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" [disabled]="userActionLoading">Creer</button>
+      </form>
+
+      <ul>
+        <li *ngFor="let user of users">
+          <span>{{ user.nom }} ({{ user.role }})</span>
+          <button type="button" class="mini-btn" [class.stop]="user.actif" (click)="toggleUserStatus(user)">
+            {{ user.actif ? 'Desactiver' : 'Activer' }}
+          </button>
+        </li>
+      </ul>
+    </article>
+
+    <article class="panel">
+      <h2>Vue globale des offres</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Domaine</th>
+            <th>Statut</th>
+            <th>Candidatures</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let offre of offres">
+            <td>{{ offre.titre }}</td>
+            <td>{{ offre.domaine }}</td>
+            <td>{{ offre.statut }}</td>
+            <td>{{ offre.nombreCandidatures }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+  </section>
+
+  <section class="panel" *ngIf="!loading">
+    <h2>Journal des emails recents</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Candidat</th>
+          <th>Destinataire</th>
+          <th>Type</th>
+          <th>Statut</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let email of recentEmails">
+          <td>{{ email.nomCandidat }}</td>
+          <td>{{ email.destinataire }}</td>
+          <td>{{ email.typeDecision }}</td>
+          <td [class.ok]="email.reussi" [class.ko]="!email.reussi">{{ email.reussi ? 'Succes' : 'Echec' }}</td>
+          <td>{{ email.dateEnvoi | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+

@@ -1,0 +1,233 @@
+{
+  "name": "SmartEmailHR - Reception candidatures",
+  "active": false,
+  "settings": {},
+  "nodes": [
+    {
+      "parameters": {
+        "mailbox": "INBOX",
+        "postProcessAction": "nothing"
+      },
+      "id": "1",
+      "name": "Email Trigger",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        220,
+        260
+      ],
+      "credentials": {
+        "imap": {
+          "id": "replace-imap-credential-id",
+          "name": "IMAP RH Mailbox"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0"
+      },
+      "id": "2",
+      "name": "Read PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        460,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "objetEmail",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "name": "nomCandidat",
+              "value": "={{ $json.fromName || '' }}",
+              "type": "string"
+            },
+            {
+              "name": "emailCandidat",
+              "value": "={{ $json.fromEmail || '' }}",
+              "type": "string"
+            },
+            {
+              "name": "contenuCv",
+              "value": "={{ $json.text || '' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5000/api/candidatures/recevoir",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "objetEmail",
+              "value": "={{ $json.objetEmail }}"
+            },
+            {
+              "name": "nomCandidat",
+              "value": "={{ $json.nomCandidat }}"
+            },
+            {
+              "name": "emailCandidat",
+              "value": "={{ $json.emailCandidat }}"
+            },
+            {
+              "name": "contenuCv",
+              "value": "={{ $json.contenuCv }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-Secret",
+              "value": "={{ $env.SMARTEMAILHR_N8N_SECRET }}"
+            }
+          ]
+        }
+      },
+      "id": "4",
+      "name": "POST Candidature Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.statusCode || 200 }}",
+              "operation": "smaller",
+              "value2": 300
+            }
+          ]
+        }
+      },
+      "id": "5",
+      "name": "IF - Succes",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/smartemailhr/error",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow",
+              "value": "reception-email"
+            },
+            {
+              "name": "payload",
+              "value": "={{ $json }}"
+            }
+          ]
+        }
+      },
+      "id": "6",
+      "name": "Error Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Email Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "POST Candidature Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Candidature Backend": {
+      "main": [
+        [
+          {
+            "node": "IF - Succes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Succes": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "SmartEmailHR"
+    }
+  ]
+}
+

@@ -1,0 +1,815 @@
+﻿✉  SmartEmail HR
+Plateforme Intelligente de Gestion du Recrutement
+CAHIER DES CHARGES
+Version 2.0 — Avril 2026
+Champ
+Détail
+Version
+2.0 — Révisée et complète
+Domaine
+Ressources Humaines (RH) — Gestion du recrutement
+Technologies
+Angular 17+ │ ASP.NET Core 8 │ SQL Server / PostgreSQL │ n8n 2.x │ Groq (LLaMA 3)
+Architecture
+Frontend SPA + API REST + Workflow d'automatisation + IA
+Authentification
+JWT Bearer Token (RH / Admin)
+Niveau
+Projet académique — 2ème Année Ingénierie
+Date
+Avril 2026
+1. Présentation du projet
+1.1 Description générale
+SmartEmail HR est une plateforme web complète de gestion intelligente du recrutement. Elle couvre l'intégralité du cycle de recrutement : de la création de l'offre d'emploi par le responsable RH, jusqu'à l'envoi automatique des réponses aux candidats, en passant par la collecte automatisée des candidatures par email, l'analyse par intelligence artificielle et la visualisation structurée sur un tableau de bord.
+La plateforme repose sur quatre piliers technologiques : Angular (frontend), ASP.NET Core (backend), n8n (automatisation des workflows), et l'API Groq — LLaMA 3 (intelligence artificielle, 100 % gratuite). Chaque candidature reçue par email est automatiquement collectée par n8n, transmise au backend, analysée par Groq, scorée et classée — permettant au RH de se concentrer uniquement sur la prise de décision. L'architecture est pensée pour une séparation stricte des responsabilités : n8n transporte, le backend orchestre, Groq analyse.
+Pourquoi ce projet est fort : Il automatise l'intégralité du recrutement, réduit le biais humain grâce à l'IA, combine 4 technologies modernes dans un cas d'usage réel et valorisable, et reste réalisable dans un cadre académique par des étudiants débutants en IA et n8n.
+1.2 Objectifs du projet
+Permettre au RH de créer et gérer des offres d'emploi structurées par domaine.
+Collecter automatiquement les candidatures reçues par email via n8n.
+Analyser et scorer chaque CV par intelligence artificielle en le comparant aux exigences du poste.
+Classer automatiquement les candidats par catégorie/domaine et par score de pertinence.
+Offrir au RH une interface claire pour consulter les candidats et prendre ses décisions.
+Automatiser l'envoi des emails de réponse (acceptation / refus) après validation du RH.
+Gérer automatiquement la fin d'une offre : refus automatique de toutes les candidatures ultérieures.
+Fournir un tableau de bord administrateur avec des statistiques globales sur le recrutement.
+1.3 Flux global du système (9 étapes)
+Le fonctionnement complet de la plateforme se déroule en 9 étapes :
+Étape
+Description
+Responsable
+1
+Le RH remplit un formulaire de création d'offre d'emploi sur la plateforme.
+RH (manuel)
+2
+L'offre est enregistrée en base de données et apparaît dans le dashboard RH.
+Backend automatique
+3
+Le RH publie l'offre sur LinkedIn ou d'autres plateformes et invite les candidats à postuler par email.
+RH (manuel)
+4
+n8n surveille la boîte mail de l'entreprise et détecte chaque nouvel email de candidature.
+n8n (automatique)
+5
+n8n extrait l'objet de l'email et le CV (PDF), puis envoie ces données au backend via HTTP POST.
+n8n (automatique)
+6
+Le backend stocke les données, parse le PDF et lie la candidature à l'offre correspondante.
+Backend automatique
+7
+L'IA analyse le CV, le compare aux exigences du poste et génère un score, un résumé et une classification.
+IA (automatique)
+8
+Le RH consulte les candidats triés par score dans le dashboard et clique sur Accepter ou Refuser.
+RH (manuel)
+9
+n8n envoie l'email de réponse (acceptation/refus) au candidat après la décision du RH.
+n8n (automatique)
+1.4 Acteurs du système
+Acteur
+Type
+Rôle principal
+Candidat
+Humain externe
+Envoie sa candidature par email avec CV en PDF. N'a pas accès à la plateforme.
+Responsable RH
+Humain interne
+Crée les offres, consulte les candidatures, prend les décisions (Accepter/Refuser).
+Administrateur
+Humain interne
+Gère les utilisateurs, supervise les statistiques globales, configure le système.
+n8n
+Système externe
+Surveille les emails, extrait les données, déclenche le backend et envoie les réponses.
+Groq (LLaMA 3)
+Service IA externe
+Analyse les CV reçus, attribue un score de pertinence (0-100 %), génère un résumé des compétences, suggère une décision, et rédige le contenu des emails de réponse. Uniquement appelé par le backend — jamais par n8n directement.
+2. Stack technique
+2.1 Technologies utilisées
+Composant
+Technologie
+Version
+Rôle
+Frontend
+Angular
+17+
+Interface utilisateur SPA — tableau de bord RH, formulaires, dashboard Admin
+Backend
+ASP.NET Core Web API
+.NET 8
+API REST — gestion des offres, candidatures, analyse IA, authentification
+Base de données
+SQL Server / PostgreSQL
+2022 / 16
+Stockage des offres, candidatures, analyses et utilisateurs
+Workflow
+n8n
+2.x
+Automatisation — surveillance email, extraction PDF, envoi des réponses
+IA externe
+Groq (LLaMA 3)
+Tier gratuit
+Analyse CV, scoring (0-100 %), classification par domaine, génération d'emails personnalisés — accès 100 % gratuit pour usage académique
+ORM
+Entity Framework Core
+8.x
+Accès à la base de données depuis C# sans SQL manuel
+Authentification
+JWT Bearer Token
+—
+Sécurisation des accès RH et Admin
+2.2 Justification des choix
+Angular 17+
+Framework frontend de Google, très utilisé en entreprise pour les dashboards et back-offices. Il impose une structure claire avec TypeScript, réduisant les erreurs. Angular Material fournit des composants UI prêts à l'emploi (tableaux, formulaires, onglets, cartes), ce qui accélère considérablement le développement du tableau de bord RH.
+ASP.NET Core 8
+Framework backend Microsoft, performant et structuré. Il permet de créer des API REST propres en C#, avec une intégration native de JWT pour l'authentification et d'Entity Framework Core pour la gestion de la base de données. Son écosystème riche facilite l'intégration de Groq via HttpClient.
+SQL Server / PostgreSQL
+Base de données relationnelle robuste et compatible avec Entity Framework Core. Le schéma relationnel (Offres → Candidatures → Analyses) est naturellement adapté à un modèle SQL, garantissant l'intégrité des données et la cohérence des liens entre entités.
+n8n
+Outil d'automatisation visuel open source (self-hosted ou cloud). n8n fonctionne par workflows composés de nœuds connectés graphiquement. Dans ce projet, il joue le rôle d'orchestrateur de données : il surveille la boîte Gmail/IMAP, extrait les pièces jointes PDF, lit leur contenu textuel, envoie les données au backend via HTTP POST, et reçoit des webhooks du backend pour déclencher l'envoi d'emails via Gmail/SMTP. Son interface en glisser-déposer le rend accessible à des débutants sans expérience en code. n8n n'intègre aucune intelligence artificielle et n'appelle jamais l'API Groq — il est exclusivement un transporteur et déclencheur de tâches.
+Groq (LLaMA 3)
+Groq est une plateforme d’inférence IA ultra-rapide qui propose un accès gratuit (via groq.com) aux grands modèles de langage open source, notamment LLaMA 3.3 70B et Mixtral 8x7B. Contrairement à OpenAI (payant dès le premier appel), Groq offre un tier gratuit généreux adapté aux projets académiques : environ 14 400 requêtes par jour sur LLaMA 3. L’API Groq est 100 % compatible avec le format de l’API OpenAI, ce qui permet de l’intégrer dans le backend ASP.NET Core avec un simple changement de base URL (https://api.groq.com/openai/v1) et de clé API. Le modèle reçoit le texte du CV et les exigences du poste, et retourne un JSON structuré contenant le score (0-100 %), le résumé des compétences, la décision suggérée et la classification par domaine. Il génère également le contenu des emails de réponse. Coût : 0 € pour un usage académique dans les limites du tier gratuit.
+3. Fonctionnalités détaillées
+3.1 Authentification et gestion des accès
+Tous les utilisateurs accèdent à la plateforme via une page de connexion sécurisée. Deux rôles distincts sont définis, chacun avec son propre périmètre fonctionnel.
+Formulaire de connexion avec champs Email et Mot de passe.
+Validation des identifiants côté backend et génération d'un token JWT.
+Toutes les routes de l'application sont protégées par un guard Angular (vérification du token).
+Redirection automatique vers le tableau de bord correspondant selon le rôle (RH ou Admin).
+Déconnexion sécurisée avec suppression du token.
+3.2 Création et gestion des offres d'emploi (RH)
+Le processus de recrutement commence par la création d'une offre structurée. C'est cette offre qui servira de référence pour l'analyse IA des CV reçus.
+Formulaire de création d'offre
+Champ du formulaire
+Type
+Obligatoire
+Description
+Titre du poste
+Texte
+Oui
+Ex : Développeur Frontend Angular
+Description du poste
+Texte long
+Oui
+Missions, responsabilités, contexte
+Compétences requises
+Liste de tags
+Oui
+Ex : Angular, TypeScript, HTML, CSS
+Niveau d'expérience
+Liste déroulante
+Oui
+Débutant / Junior / Confirmé / Senior
+Domaine / Catégorie
+Liste déroulante
+Oui
+Ex : Développement Web, Data, Réseaux, Sécurité...
+Date d'expiration
+Sélecteur de date
+Oui
+Date limite de réception des candidatures
+L'offre est enregistrée en base de données et apparaît immédiatement dans le dashboard.
+Les offres sont organisées par catégorie/domaine dans l'interface.
+Le RH peut modifier, désactiver ou supprimer une offre à tout moment.
+Une offre peut avoir trois statuts : Active, Expirée, Désactivée.
+3.3 Collecte automatique des candidatures (n8n)
+Dès qu'un candidat envoie un email à l'adresse RH de l'entreprise, le workflow n8n prend en charge le traitement automatique sans aucune intervention humaine. Il est fondamental de comprendre le rôle précis de n8n dans ce système : n8n n'appelle jamais l'IA directement. n8n joue le rôle d'un facteur intelligent — il collecte les données (emails entrants), les livre au backend, et distribue les réponses (emails sortants). L'analyse par IA est exclusivement effectuée par le backend ASP.NET Core, qui est le seul à communiquer avec l'API Groq.
+Le trigger IMAP de n8n surveille en permanence la boîte mail de l'entreprise.
+À la réception d'un email, n8n extrait : l'objet de l'email (pour identifier le poste visé), l'adresse email et le nom de l'expéditeur, le fichier PDF joint (CV).
+n8n lit le texte brut du PDF via le nœud intégré de lecture PDF.
+n8n envoie une requête HTTP POST vers le backend avec toutes ces données.
+Règle fondamentale du système — n8n ne touche jamais l'IA. n8n ne fait que transporter des données. Groq est appelé uniquement par le backend ASP.NET Core. Pensez à n8n comme un facteur et à Groq comme un expert : le facteur (n8n) collecte le courrier (emails entrants), le livre au bureau (backend), et envoie les réponses (emails sortants) — il ne sait pas analyser un CV. L'expert (Groq) est dans le bureau (backend) : c'est lui qui analyse, score et rédige. Le bureau (backend) est le chef d'orchestre : il reçoit du facteur, consulte l'expert, range les résultats, et redonne au facteur ce qu'il faut envoyer.
+3.4 Traitement et stockage des candidatures (Backend)
+À la réception des données envoyées par n8n, le backend ASP.NET Core effectue les opérations suivantes :
+Réception et validation des données (email, objet, texte du CV).
+Identification du poste visé en comparant l'objet de l'email aux offres actives en base.
+Création d'un enregistrement Candidature lié à l'offre correspondante.
+Appel de l'API Groq avec le texte du CV et les exigences du poste (voir section 3.5).
+Stockage de l'analyse IA (score, résumé, classification, compétences détectées).
+Mise à jour du statut de la candidature : En attente de décision RH.
+3.5 Analyse intelligente des CV par l'IA
+L'intelligence artificielle (Groq — LLaMA 3) est le moteur analytique central de la plateforme. Elle est appelée par le backend à chaque réception de candidature.
+Ce que l'IA reçoit en entrée
+Le texte brut extrait du CV du candidat.
+Le titre du poste, la description, les compétences requises et le niveau d'expérience attendu (issus du formulaire RH).
+La catégorie/domaine de l'offre.
+Ce que l'IA produit en sortie (JSON structuré)
+Champ retourné
+Type
+Description
+score
+Number (0-100)
+Score de pertinence du candidat par rapport au poste (en %)
+resume_competences
+String
+Résumé textuel des compétences du candidat détectées dans le CV
+competences_detectees
+Array<String>
+Liste des compétences identifiées (ex : ["Angular", "TypeScript"])
+classification
+String
+Domaine détecté dans le CV (ex : "Développement Web")
+coherence_poste
+Boolean
+Indique si le profil du candidat correspond réellement au poste visé
+decision_suggeree
+String
+Suggestion de l'IA : "Accepté" ou "À examiner" ou "Refusé"
+Important : La décision finale appartient toujours au RH. L'IA ne fait que suggérer. Le RH peut accepter ou refuser un candidat indépendamment de la suggestion de l'IA.
+3.6 Tableau de bord RH — Visualisation des candidatures
+C'est l'interface principale du responsable RH. Elle offre une vue structurée et intuitive de toutes les candidatures.
+Organisation de la vue
+Liste des domaines/catégories sous forme d'onglets (Dev Frontend, Dev Backend, Data, Sécurité, Marketing...).
+Chaque onglet affiche les offres d'emploi actives du domaine correspondant.
+Chaque offre liste les candidatures associées.
+Informations affichées pour chaque candidat
+Nom complet et adresse email.
+Score IA (badge coloré : vert si élevé, orange si moyen, rouge si faible).
+Résumé des compétences générées par l'IA.
+Statut actuel (En attente / Accepté / Refusé).
+Lien pour consulter le CV original (PDF).
+Fonctionnalités de tri et de filtre
+Tri automatique des candidats par score décroissant (les meilleurs en premier).
+Filtrage par domaine, par offre, par statut.
+Recherche par nom ou par compétence.
+3.7 Fiche candidat et prise de décision (RH)
+Chaque candidat dispose d'une fiche détaillée accessible depuis le tableau de bord.
+Élément affiché
+Description
+Identité
+Nom complet, email, poste visé.
+Score IA
+Note sur 100, avec badge coloré selon le niveau.
+Résumé IA
+Paragraphe décrivant le profil et les compétences du candidat.
+Compétences
+Tags listant les compétences détectées.
+Cohérence
+Indication IA : le profil correspond-il au poste ?
+CV
+Bouton pour afficher ou télécharger le CV en PDF.
+Décision actuelle
+Badge : En attente / Accepté / Refusé.
+Bouton Accepter
+Bouton vert déclenchant le workflow d'acceptation n8n.
+Bouton Refuser
+Bouton rouge déclenchant le workflow de refus n8n.
+3.8 Envoi automatique des emails de réponse (n8n)
+Lorsque le RH clique sur « Accepter » ou « Refuser », le système déclenche automatiquement un workflow n8n qui gère l'envoi de l'email de réponse.
+Flux d'acceptation
+Le RH clique sur « Accepter ».
+Le backend appelle l'API Groq (LLaMA 3) pour générer le contenu de l'email d'acceptation, personnalisé avec le nom du candidat, le poste visé et une proposition de planification d'entretien.
+Le backend appelle le webhook n8n avec les données de l'email.
+n8n envoie l'email au candidat (via SMTP ou Gmail) avec une proposition de planification d'entretien.
+Le statut du candidat est mis à jour : Accepté.
+Flux de refus
+Le RH clique sur « Refuser ».
+Le backend appelle l'API Groq (LLaMA 3) pour générer un email de refus courtois et personnalisé, incluant le nom du candidat et le poste visé.
+Le backend appelle le webhook n8n.
+n8n envoie l'email de refus au candidat.
+Le statut du candidat est mis à jour : Refusé.
+Étape de validation obligatoire : avant tout envoi, l'email généré par Groq est affiché dans une modale Angular visible par le RH. Le RH peut lire le contenu, le modifier si nécessaire, puis cliquer sur « Confirmer l'envoi ». Ce n'est qu'après cette confirmation que le backend appelle le webhook n8n pour déclencher l'envoi réel via Gmail/SMTP. n8n reçoit uniquement les données finales (destinataire, sujet, corps) — il ne génère rien, il envoie.
+3.9 Gestion de la fin d'une offre
+Lorsqu'un recrutement est terminé ou que l'offre a expiré, le système applique automatiquement une règle de fermeture.
+Le RH peut manuellement désactiver ou supprimer une offre depuis le tableau de bord.
+Les offres dépassant leur date d'expiration sont automatiquement désactivées.
+Tous les emails reçus pour une offre désactivée sont automatiquement refusés par n8n, sans intervention du RH.
+Un email de refus automatique est envoyé au candidat indiquant que le poste n'est plus disponible.
+Les candidatures reçues après la fermeture restent visibles dans le dashboard à des fins d'archivage.
+3.10 Tableau de bord Administrateur
+L'administrateur dispose d'une vue globale sur toute l'activité de la plateforme.
+Nombre total de candidatures reçues, acceptées et refusées.
+Statistiques par domaine (graphique en barres).
+Ratio Acceptés / Refusés (graphique circulaire).
+Liste des derniers emails envoyés avec horodatage.
+Top candidats (meilleurs scores acceptés) et candidats refusés (scores faibles).
+Gestion des utilisateurs RH (création, modification, désactivation de comptes).
+Vue de toutes les offres d'emploi avec leur statut (Active / Expirée / Désactivée).
+4. Description des interfaces utilisateur
+Les interfaces décrites ci-dessous sont directement inspirées des maquettes fournies. La plateforme finale doit être aussi fidèle que possible à ces designs.
+4.1 Page de connexion
+Élément
+Description
+Titre
+« Smart Email HR Assistant » en grand, centré, fond bleu foncé.
+Sous-titre
+« Bienvenue — Connectez-vous à votre compte »
+Champ Email
+Champ texte avec icône enveloppe. Validation de format email.
+Champ Mot de passe
+Champ password avec icône cadenas. Option afficher/masquer.
+Bouton
+« Se connecter » pleine largeur, fond bleu foncé, texte blanc, arrondi.
+Gestion des erreurs
+Message d'erreur en rouge si identifiants incorrects.
+Design global
+Fond bleu dégradé, formulaire centré sur fond blanc, illustration enveloppes en arrière-plan.
+4.2 Tableau de bord RH — Vue principale
+Élément
+Description
+Barre de navigation
+Logo + « Tableau de Bord RH », icônes globe / cloche (notifications) / profil / menu.
+Onglets de domaines
+Onglets horizontaux par catégorie (Dev Frontend, Dev Backend, Sécurité, Marketing...). Onglet actif souligné en bleu.
+Cartes statistiques
+4 cartes colorées par domaine indiquant le nombre de candidats. Icône dédiée par domaine.
+Tableau des candidats
+Colonnes : Nom, Poste, Score (triable), Statut (badge coloré). Clic sur une ligne → fiche candidat.
+Badges de statut
+Vert = Accepté │ Rouge = Refusé │ Orange = En attente.
+Bouton Créer une offre
+Bouton bleu en haut à droite pour ouvrir le formulaire de création d'offre.
+4.3 Formulaire de création d'offre (modal ou page dédiée)
+Élément
+Description
+Champs
+Titre, Description (textarea), Compétences (tags), Niveau d'expérience (select), Domaine (select), Date d'expiration (datepicker).
+Validation
+Tous les champs sont obligatoires. Messages d'erreur inline.
+Boutons
+« Créer l'offre » (bleu) et « Annuler » (gris).
+Après soumission
+Confirmation visuelle et retour au tableau de bord avec la nouvelle offre visible.
+4.4 Vue liste des candidats par domaine
+Élément
+Description
+En-tête
+« Candidats — [Nom du domaine] » avec icônes de contrôle.
+Colonne Acceptés
+Liste des candidats acceptés avec score (badge vert). Titre en bleu : « Acceptés (N) ».
+Colonne Refusés
+Liste des candidats refusés avec score (badge rouge). Titre en rouge : « Refusés (N) ».
+Colonne En attente
+Liste des candidats en attente de décision. Titre en orange.
+Avatars
+Photo de profil circulaire à gauche du nom (ou initiales si pas de photo).
+Interaction
+Clic sur un candidat → ouverture de la fiche détaillée.
+4.5 Fiche détaillée d'un candidat
+Élément
+Description
+En-tête
+« Détails du Candidat » avec icône et menu.
+Profil
+Avatar circulaire + Nom complet + Poste visé.
+Score
+Texte « Score : XX % » en gras, badge coloré.
+Décision IA
+Badge « Accepté » (vert) / « À examiner » (orange) / « Refusé » (rouge).
+Résumé IA
+Paragraphe de description du profil généré par l'IA.
+Compétences
+Tags/badges listant les compétences détectées dans le CV.
+Cohérence poste
+Indicateur visuel : profil cohérent avec le poste (oui/non).
+CV
+Bouton « Voir le CV » pour afficher ou télécharger le PDF.
+Bouton Accepter
+Bouton vert « Envoyer Acceptation » avec icône enveloppe.
+Bouton Refuser
+Bouton rouge « Envoyer Refus » avec icône enveloppe.
+Modale de confirmation
+Avant envoi : affichage du contenu de l'email généré, avec bouton « Confirmer l'envoi ».
+4.6 Tableau de bord Administrateur
+Élément
+Description
+KPIs
+Cartes : Candidatures totales, CV Acceptés, CV Refusés, Offres actives.
+Graphique circulaire
+Camembert Acceptés (vert) vs Refusés (rouge) avec pourcentages.
+Histogramme
+Barres par domaine avec count de candidats.
+Journal des emails
+Liste des derniers emails envoyés avec nom, statut, poste, heure.
+Top Scores
+Meilleurs candidats acceptés avec leur score.
+Faibles Scores
+Candidats refusés avec les scores les plus faibles.
+Gestion utilisateurs
+Tableau des comptes RH avec actions Créer / Modifier / Désactiver.
+Gestion des offres
+Vue globale de toutes les offres avec statut et actions.
+5. Architecture technique
+5.1 Couches de l'architecture
+Couche
+Technologie
+Responsabilité
+Présentation
+Angular 17+
+Afficher les données, formulaires, dashboards, modales. Aucune logique métier.
+API REST
+ASP.NET Core 8
+Endpoints HTTP, validation, orchestration des services.
+Logique métier
+Services C#
+Analyse IA (Groq), authentification JWT, gestion des offres et candidatures.
+Persistance
+EF Core + SQL Server
+Stockage et récupération des données via ORM.
+Automatisation
+n8n
+Surveillance email, extraction PDF, déclenchement backend, envoi des réponses.
+5.2 Schéma de base de données
+Table : Offres
+Colonne
+Type
+Description
+Id
+UUID (PK)
+Identifiant unique de l'offre
+Titre
+VARCHAR(200)
+Titre du poste
+Description
+TEXT
+Description complète du poste
+CompetencesRequises
+TEXT
+Liste des compétences (JSON ou texte séparé par virgules)
+NiveauExperience
+VARCHAR(50)
+Débutant / Junior / Confirmé / Senior
+Domaine
+VARCHAR(100)
+Catégorie : Dev Frontend, Data, Sécurité...
+DateExpiration
+DATE
+Date limite de candidature
+Statut
+VARCHAR(20)
+Active / Expiree / Desactivee
+DateCreation
+TIMESTAMP
+Date de création de l'offre
+CreePar
+UUID (FK)
+Identifiant du RH ayant créé l'offre
+Table : Candidatures
+Colonne
+Type
+Description
+Id
+UUID (PK)
+Identifiant unique de la candidature
+OffreId
+UUID (FK)
+Référence à l'offre concernée
+NomCandidat
+VARCHAR(200)
+Nom extrait de l'email
+EmailCandidat
+VARCHAR(320)
+Adresse email du candidat
+ContenuCV
+TEXT
+Texte brut extrait du PDF
+DateReception
+TIMESTAMP
+Date de réception de l'email
+Statut
+VARCHAR(20)
+EnAttente / Accepte / Refuse
+EmailReponsEnvoye
+BOOLEAN
+Email de réponse envoyé ou non
+Table : AnalysesIA
+Colonne
+Type
+Description
+Id
+UUID (PK)
+Identifiant unique de l'analyse
+CandidatureId
+UUID (FK)
+Référence à la candidature analysée
+Score
+INTEGER (0-100)
+Score de pertinence attribué par l'IA
+ResumeCompetences
+TEXT
+Résumé narratif du profil généré par l'IA
+CompetencesDetectees
+TEXT
+Liste JSON des compétences identifiées
+Classification
+VARCHAR(100)
+Domaine détecté dans le CV
+CoherencePoste
+BOOLEAN
+CV cohérent avec le poste visé ?
+DecisionSuggeree
+VARCHAR(20)
+Suggestion IA : Accepté / A examiner / Refusé
+DateAnalyse
+TIMESTAMP
+Date de l'analyse
+Table : Users
+Colonne
+Type
+Description
+Id
+UUID (PK)
+Identifiant unique
+Nom
+VARCHAR(200)
+Nom complet
+Email
+VARCHAR(320)
+Adresse email (identifiant de connexion)
+MotDePasse
+VARCHAR(60)
+Hash bcrypt du mot de passe
+Role
+VARCHAR(10)
+'rh' ou 'admin'
+DateCreation
+TIMESTAMP
+Date de création du compte
+5.3 Structure des dossiers du projet
+SmartEmailHR/
+├── backend/                     ← Projet ASP.NET Core 8
+│   └── SmartEmailHR.API/
+│       ├── Controllers/         ← Auth, Offres, Candidatures, Stats
+│       ├── Models/              ← Offre, Candidature, AnalyseIA, User
+│       ├── DTOs/                ← Objets de transfert (Request/Response)
+│       ├── Services/            ← GroqService, EmailService, AuthService
+│       ├── Data/                ← AppDbContext (Entity Framework)
+│       ├── appsettings.json     ← Config DB, Groq API Key, JWT
+│       └── Program.cs           ← Point d'entrée, injection de dépendances
+│
+├── frontend/                    ← Projet Angular 17+
+│   └── src/app/
+│       ├── pages/               ← login, dashboard-rh, offre-form, candidat-detail, dashboard-admin
+│       ├── components/          ← CandidatCard, OffreCard, EmailModal, StatCard
+│       ├── services/            ← auth.service, offre.service, candidature.service
+│       ├── guards/              ← auth.guard, role.guard
+│       └── models/              ← Interfaces TypeScript
+│
+├── n8n/
+│   ├── workflow-reception-email.json    ← Surveillance IMAP + appel backend
+│   ├── workflow-envoi-acceptation.json  ← Envoi email acceptation via webhook
+│   ├── workflow-envoi-refus.json        ← Envoi email refus via webhook
+│   └── workflow-offre-expiree.json      ← Refus automatique offres fermées
+│
+├── database/
+│   └── init.sql                         ← Script de création des tables
+│
+└── README.md                            ← Instructions de démarrage
+6. Endpoints API REST
+6.1 Authentification
+Méthode
+Endpoint
+Description
+Auth
+POST
+/api/auth/login
+Connexion, retourne un token JWT.
+Non
+GET
+/api/auth/me
+Infos de l'utilisateur connecté.
+Oui
+6.2 Offres d'emploi
+Méthode
+Endpoint
+Description
+Auth
+GET
+/api/offres
+Liste toutes les offres (filtres : domaine, statut).
+Oui
+POST
+/api/offres
+Crée une nouvelle offre d'emploi.
+Oui (RH)
+GET
+/api/offres/:id
+Détails d'une offre et ses candidatures.
+Oui
+PATCH
+/api/offres/:id
+Modifie ou désactive une offre.
+Oui (RH)
+DELETE
+/api/offres/:id
+Supprime une offre.
+Oui (RH)
+6.3 Candidatures
+Méthode
+Endpoint
+Description
+Auth
+POST
+/api/candidatures/recevoir
+Reçoit les données de n8n, parse le CV, appelle l'IA, stocke la candidature.
+Clé n8n
+GET
+/api/candidatures
+Liste les candidatures (filtres : offre, statut, domaine).
+Oui
+GET
+/api/candidatures/:id
+Détails complets d'un candidat + analyse IA.
+Oui
+PATCH
+/api/candidatures/:id/decision
+Met à jour la décision (accepte/refuse).
+Oui (RH)
+6.4 Emails
+Méthode
+Endpoint
+Description
+Auth
+POST
+/api/emails/generer
+Génère le contenu de l'email via Groq.
+Oui (RH)
+POST
+/api/emails/envoyer
+Déclenche le webhook n8n pour envoi.
+Oui (RH)
+6.5 Statistiques (Admin)
+Méthode
+Endpoint
+Description
+Auth
+GET
+/api/stats/global
+KPIs globaux (total, acceptés, refusés, par domaine).
+Oui (Admin)
+GET
+/api/stats/emails-recents
+Journal des derniers emails envoyés.
+Oui (Admin)
+GET
+/api/stats/top-candidats
+Top candidats acceptés par score.
+Oui (Admin)
+7. Workflows n8n
+7.1 Workflow 1 — Réception des candidatures
+Ce workflow est actif en permanence. Il surveille la boîte email de l'entreprise et traite automatiquement chaque nouvelle candidature. Rappel fondamental : ce workflow ne fait que collecter et transporter des données vers le backend. Il n'appelle jamais l'API Groq. La chaîne exacte est la suivante : (1) détection du nouvel email via IMAP, (2) extraction du fichier PDF joint, (3) lecture du texte brut du PDF via le nœud natif n8n, (4) envoi de toutes les données au backend via une requête HTTP POST contenant { nom, email, objet_email, texte_cv }, puis le backend prend le relais pour l'analyse IA.
+Nœud n8n
+Type
+Configuration
+1. Email Trigger
+IMAP / Gmail Trigger
+Connexion à la boîte mail, déclenchement à chaque email avec pièce jointe PDF.
+2. Extract PDF
+Binary Data Extract
+Extraction du fichier PDF joint.
+3. Read PDF Text
+PDF Read (nœud natif)
+Extraction du texte brut depuis le PDF.
+4. Set Variables
+Set Node
+Préparation des données : objet email, email expéditeur, texte CV.
+5. HTTP Request
+HTTP Request Node
+POST vers /api/candidatures/recevoir avec les données extraites.
+6. IF — Succès ?
+IF Node
+Vérification du code de retour HTTP (200 = succès).
+7. Error Log
+Set + HTTP Request
+En cas d'erreur, envoi d'une alerte à l'Admin.
+7.2 Workflow 2 — Envoi email d'acceptation
+Déclenché par un webhook appelé depuis le backend, après que le RH a confirmé sa décision dans la modale Angular. À ce stade, le contenu de l'email a déjà été généré par Groq et validé par le RH. n8n reçoit uniquement les données finales prêtes à envoyer — il ne génère aucun contenu.
+Nœud n8n
+Type
+Configuration
+1. Webhook
+Webhook Node
+Reçoit : email_destinataire, nom_candidat, poste, corps_email.
+2. Gmail / SMTP
+Gmail ou SMTP Node
+Envoi de l'email au candidat avec le contenu personnalisé + proposition d'entretien.
+3. HTTP Request
+HTTP Request Node
+PATCH vers /api/candidatures/:id pour confirmer emailReponsEnvoye: true.
+4. Respond
+Respond to Webhook
+Retour status: success au backend.
+7.3 Workflow 3 — Envoi email de refus
+Identique au workflow 2 dans son fonctionnement, mais déclenché lors d'un refus. Le contenu de l'email de refus a déjà été généré par Groq et validé (ou modifié) par le RH dans la modale Angular. n8n reçoit uniquement { email_destinataire, sujet, corps_email_refus } et procède à l'envoi via Gmail ou SMTP. Il ne génère aucun contenu.
+Nœud n8n
+Type
+Configuration
+1. Webhook
+Webhook Node
+Reçoit : email_destinataire, nom_candidat, poste, corps_email_refus.
+2. Gmail / SMTP
+Gmail ou SMTP Node
+Envoi de l'email de refus au candidat.
+3. HTTP Request
+HTTP Request Node
+PATCH vers /api/candidatures/:id pour confirmer la décision.
+4. Respond
+Respond to Webhook
+Retour status: success au backend.
+7.4 Workflow 4 — Refus automatique (offre expirée)
+Ce workflow est déclenché automatiquement chaque jour via un planificateur (Cron Trigger). Il vérifie les offres expirées et envoie des emails de refus automatiques aux candidats encore en attente. Particularité importante : le contenu de l'email de refus automatique est un texte fixe prédéfini directement dans n8n — il n'appelle pas Groq, car il n'y a pas de RH disponible pour valider un contenu généré par l'IA dans ce cas. C'est le seul workflow où n8n contient lui-même le contenu du message.
+Nœud n8n
+Type
+Configuration
+1. Cron Trigger
+Schedule Trigger
+Vérification quotidienne des offres expirées.
+2. HTTP Request
+HTTP Request Node
+GET /api/offres?statut=expiree pour récupérer les offres fermées.
+3. HTTP Request
+HTTP Request Node
+GET /api/candidatures?statut=en_attente&offreExpiree=true pour récupérer les candidatures en attente sur offres fermées.
+4. Loop
+SplitInBatches
+Itération sur chaque candidature en attente.
+5. Gmail / SMTP
+Gmail ou SMTP Node
+Envoi d'un email automatique de refus (offre non disponible).
+6. HTTP Request
+HTTP Request Node
+PATCH vers /api/candidatures/:id (statut: Refuse, emailReponsEnvoye: true).
+8. Contraintes et exigences
+8.1 Contraintes techniques
+L'application doit fonctionner en local (localhost) sans déploiement cloud obligatoire.
+n8n doit être installé en local via Docker ou npm.
+La base de données SQL Server ou PostgreSQL doit être accessible en local ou via un service gratuit.
+La clé API Groq ne doit jamais être exposée côté frontend (stockée dans appsettings.json ou .env, hors Git).
+Toutes les données sensibles doivent être dans des fichiers de configuration exclus du versionnement (.gitignore).
+8.2 Contraintes académiques
+Projet réalisable en 5 à 7 semaines par des étudiants de 2ème année d'ingénierie.
+Technologies accessibles : Angular, .NET, n8n et Groq sont tous documentés avec des tutoriels débutants.
+Code source versionné sur GitHub ou GitLab.
+README.md complet avec instructions de démarrage étape par étape.
+Données de démonstration (offres et candidats fictifs) incluses pour la soutenance.
+8.3 Exigences de sécurité
+Les mots de passe sont hashés avec bcrypt (minimum 10 rounds).
+Toutes les routes protégées vérifient la validité et l'expiration du token JWT.
+Les routes Admin sont inaccessibles aux utilisateurs RH (vérification du rôle).
+Les requêtes de n8n vers le backend sont authentifiées par un en-tête secret partagé.
+8.4 Exigences de performance
+Réponses API standard (lecture, mise à jour) : inférieures à 2 secondes.
+Analyse IA d'un CV : jusqu'à 5 secondes (Groq est significativement plus rapide qu'OpenAI grâce à ses puces LPU dédiées). Un spinner de chargement doit être affiché.
+Génération du contenu d'un email : jusqu'à 5 secondes. Un indicateur de chargement doit être affiché.
+9. Plan de réalisation
+Phase
+Tâches principales
+Durée estimée
+Phase 1 — Setup
+Installation : Angular CLI, .NET SDK, SQL Server/PostgreSQL, n8n (Docker). Initialisation Git. Structure des dossiers. Fichiers de configuration (.env, appsettings.json).
+3-4 jours
+Phase 2 — Backend Core
+Modèles EF Core (Offre, Candidature, AnalyseIA, User). Migrations et création des tables. Endpoints Auth (login, JWT). Endpoints CRUD Offres.
+5-6 jours
+Phase 3 — Intégration IA
+Service Groq (analyse CV + génération email). Endpoint /api/candidatures/recevoir. Tests avec Postman.
+3-4 jours
+Phase 4 — Frontend RH
+Page de connexion Angular. Tableau de bord RH (onglets, tableau, badges). Formulaire de création d'offre. Fiche candidat + modale email.
+7-8 jours
+Phase 5 — Workflows n8n
+Workflow 1 (réception email). Workflow 2/3 (envoi acceptation/refus). Workflow 4 (offre expirée). Tests end-to-end.
+4-5 jours
+Phase 6 — Dashboard Admin
+Page statistiques (KPIs, graphiques Angular Material / Chart.js). Gestion utilisateurs. Journal des emails.
+3-4 jours
+Phase 7 — Tests & Finition
+Tests fonctionnels complets. Correction des bugs. Données de démonstration. Commentaires du code.
+3-4 jours
+Phase 8 — Documentation
+README.md complet. Préparation de la soutenance. Diagrammes (flux, BDD).
+2-3 jours
+10. Glossaire
+Terme
+Définition
+Angular
+Framework JavaScript/TypeScript de Google pour créer des interfaces web dynamiques (SPA).
+ASP.NET Core
+Framework backend Microsoft pour créer des API REST en C#.
+Entity Framework Core (EF Core)
+ORM qui traduit les classes C# en tables SQL, évitant d'écrire du SQL manuellement.
+JWT
+JSON Web Token. Jeton chiffré contenant les infos d'un utilisateur connecté, utilisé pour sécuriser les routes.
+n8n
+Outil d'automatisation de workflows open source avec interface visuelle. Aucune IA intégrée.
+Webhook
+URL spéciale qui reçoit des données envoyées par un autre service. Utilisé pour déclencher n8n depuis le backend.
+Groq (LLaMA 3)
+Modèle d'IA accessible via une API HTTP. Analyse les CV, attribue des scores et génère des textes.
+IMAP
+Protocole permettant à n8n de surveiller et lire les emails d'une boîte mail.
+SMTP
+Protocole d'envoi d'emails, utilisé par n8n pour envoyer les réponses aux candidats.
+SPA
+Single Page Application. Application web dont le contenu se charge dynamiquement sans rechargement de page.
+ORM
+Object-Relational Mapper. Outil qui traduit les objets du code en lignes dans une base de données relationnelle.
+Score IA
+Note de 0 à 100 % attribuée par l'IA mesurant l'adéquation du CV avec les exigences du poste.
+bcrypt
+Algorithme de hachage pour stocker les mots de passe de manière sécurisée et irréversible.
+Guard Angular
+Mécanisme Angular qui protège les routes de l'application (vérifie si l'utilisateur est connecté et a le bon rôle).
+Parsing PDF
+Extraction du texte brut contenu dans un fichier PDF pour permettre son analyse par l'IA.
+SmartEmail HR — Cahier des Charges v2.0
+Projet académique — 2ème Année Ingénierie — Angular │ ASP.NET Core │ n8n │ Groq — Avril 2026

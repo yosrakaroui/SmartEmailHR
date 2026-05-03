@@ -1,0 +1,24 @@
+<article class="offre-card">
+  <header>
+    <h3>{{ offre.titre }}</h3>
+    <span class="status" [class.closed]="offre.statut !== 'Active'">{{ offre.statut }}</span>
+  </header>
+
+  <p class="description">{{ offre.description }}</p>
+
+  <div class="meta">
+    <span>Domaine: {{ offre.domaine }}</span>
+    <span>Exp: {{ offre.niveauExperience }}</span>
+    <span>Expiration: {{ offre.dateExpiration | date: 'dd/MM/yyyy' }}</span>
+  </div>
+
+  <div class="skills">
+    <span class="skill" *ngFor="let skill of offre.competencesRequises">{{ skill }}</span>
+  </div>
+
+  <footer>
+    <button type="button" (click)="open.emit(offre.id)">Voir candidatures ({{ offre.nombreCandidatures }})</button>
+    <button type="button" class="secondary" (click)="edit.emit(offre.id)">Modifier</button>
+  </footer>
+</article>
+

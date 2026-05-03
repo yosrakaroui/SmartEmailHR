@@ -1,0 +1,26 @@
+<section class="overlay" *ngIf="visible">
+  <article class="modal">
+    <header>
+      <h3>{{ title }}</h3>
+      <button type="button" (click)="close.emit()">✕</button>
+    </header>
+
+    <label>
+      Sujet
+      <input [(ngModel)]="sujet" />
+    </label>
+
+    <label>
+      Corps
+      <textarea rows="10" [(ngModel)]="corps"></textarea>
+    </label>
+
+    <footer>
+      <button type="button" class="secondary" (click)="close.emit()">Annuler</button>
+      <button type="button" [disabled]="loading" (click)="onConfirm()">
+        {{ loading ? 'Envoi...' : 'Confirmer l’envoi' }}
+      </button>
+    </footer>
+  </article>
+</section>
+

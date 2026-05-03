@@ -1,0 +1,35 @@
+@SmartEmailHR.API_HostAddress = http://localhost:5000
+@jwt = PUT_YOUR_JWT_HERE
+@n8nSecret = CHANGE_ME_N8N_SECRET
+
+### Login RH
+POST {{SmartEmailHR.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rh@smartemailhr.local",
+  "motDePasse": "Rh@123456"
+}
+
+### Offres
+GET {{SmartEmailHR.API_HostAddress}}/api/offres
+Authorization: Bearer {{jwt}}
+Accept: application/json
+
+### Statistiques globales (admin)
+GET {{SmartEmailHR.API_HostAddress}}/api/stats/global
+Authorization: Bearer {{jwt}}
+Accept: application/json
+
+### Réception candidature n8n
+POST {{SmartEmailHR.API_HostAddress}}/api/candidatures/recevoir
+X-N8N-Secret: {{n8nSecret}}
+Content-Type: application/json
+
+{
+  "objetEmail": "Candidature - Développeur Frontend Angular",
+  "nomCandidat": "Test Candidat",
+  "emailCandidat": "test.candidat@example.com",
+  "contenuCv": "Angular, TypeScript, RxJS, HTML, CSS",
+  "cvUrl": "https://example.local/cv/test-candidat.pdf"
+}

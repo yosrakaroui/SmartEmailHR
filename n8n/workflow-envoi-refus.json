@@ -1,0 +1,132 @@
+{
+  "name": "SmartEmailHR - Envoi refus",
+  "active": false,
+  "settings": {},
+  "nodes": [
+    {
+      "parameters": {
+        "path": "smartemailhr/refus",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook Refus",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "to": "={{ $json.body.email_destinataire }}",
+        "subject": "={{ $json.body.sujet }}",
+        "message": "={{ $json.body.corps_email }}"
+      },
+      "id": "2",
+      "name": "Send Email (SMTP/Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        240
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "replace-gmail-credential-id",
+          "name": "SMTP RH"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://localhost:5000/api/candidatures/{{ $json.body.candidature_id }}/email-envoye",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "emailReponseEnvoye",
+              "value": true
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-Secret",
+              "value": "={{ $env.SMARTEMAILHR_N8N_SECRET }}"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Confirm Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        740,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"success\",\"workflow\":\"refus\"}"
+      },
+      "id": "4",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        980,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Refus": {
+      "main": [
+        [
+          {
+            "node": "Send Email (SMTP/Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email (SMTP/Gmail)": {
+      "main": [
+        [
+          {
+            "node": "Confirm Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Backend": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "SmartEmailHR"
+    }
+  ]
+}
+

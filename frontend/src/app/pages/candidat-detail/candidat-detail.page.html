@@ -1,0 +1,61 @@
+<main class="detail-page" *ngIf="!loading && candidature; else loadingTpl">
+  <header>
+    <a routerLink="/rh/dashboard">← Retour</a>
+    <h1>Détails du Candidat</h1>
+  </header>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="card">
+    <div class="row">
+      <div>
+        <h2>{{ candidature.nomCandidat }}</h2>
+        <p>{{ candidature.emailCandidat }}</p>
+        <p><strong>Poste:</strong> {{ candidature.titreOffre }}</p>
+        <p><strong>Domaine:</strong> {{ candidature.domaine }}</p>
+      </div>
+
+      <div class="score-box">
+        <p class="score">{{ candidature.analyseIA?.score ?? 0 }}%</p>
+        <p>{{ candidature.analyseIA?.decisionSuggeree }}</p>
+      </div>
+    </div>
+
+    <hr />
+
+    <p><strong>Résumé IA:</strong> {{ candidature.analyseIA?.resumeCompetences }}</p>
+    <p><strong>Cohérence poste:</strong> {{ candidature.analyseIA?.coherencePoste ? 'Oui' : 'Non' }}</p>
+
+    <div class="skills">
+      <span *ngFor="let skill of candidature.analyseIA?.competencesDetectees">{{ skill }}</span>
+    </div>
+
+    <div class="actions">
+      <a *ngIf="candidature.cvUrl" [href]="candidature.cvUrl" target="_blank" rel="noreferrer">Voir le CV</a>
+      <button type="button" class="accept" [disabled]="actionLoading" (click)="prepareDecision('Accepte')">
+        Envoyer Acceptation
+      </button>
+      <button type="button" class="refuse" [disabled]="actionLoading" (click)="prepareDecision('Refuse')">
+        Envoyer Refus
+      </button>
+    </div>
+  </section>
+
+  <app-email-modal
+    [visible]="emailModalVisible"
+    [sujet]="emailSujet"
+    [corps]="emailCorps"
+    [loading]="actionLoading"
+    [title]="pendingDecision === 'Accepte' ? 'Email d’acceptation' : 'Email de refus'"
+    (close)="emailModalVisible = false"
+    (confirm)="confirmEmail($event)">
+  </app-email-modal>
+</main>
+
+<ng-template #loadingTpl>
+  <main class="detail-page">
+    <p class="muted">Chargement de la candidature...</p>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </main>
+</ng-template>
+
