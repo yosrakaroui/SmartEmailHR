@@ -12,6 +12,7 @@ Thumbs.db
 # Node / Angular
 **/node_modules/
 frontend/dist/
+**/target/
 
 # Secrets / env
 .env
