@@ -1,4 +1,4 @@
-﻿✉  SmartEmail HR
+✉  SmartEmail HR
 Plateforme Intelligente de Gestion du Recrutement
 CAHIER DES CHARGES
 Version 2.0 — Avril 2026
@@ -9,7 +9,7 @@ Version
 Domaine
 Ressources Humaines (RH) — Gestion du recrutement
 Technologies
-Angular 17+ │ ASP.NET Core 8 │ SQL Server / PostgreSQL │ n8n 2.x │ Groq (LLaMA 3)
+Angular 21 │ Java 17+ / Spring Boot 3 │ MySQL / MariaDB │ n8n 2.x │ Groq (LLaMA 3)
 Architecture
 Frontend SPA + API REST + Workflow d'automatisation + IA
 Authentification
@@ -21,7 +21,7 @@ Avril 2026
 1. Présentation du projet
 1.1 Description générale
 SmartEmail HR est une plateforme web complète de gestion intelligente du recrutement. Elle couvre l'intégralité du cycle de recrutement : de la création de l'offre d'emploi par le responsable RH, jusqu'à l'envoi automatique des réponses aux candidats, en passant par la collecte automatisée des candidatures par email, l'analyse par intelligence artificielle et la visualisation structurée sur un tableau de bord.
-La plateforme repose sur quatre piliers technologiques : Angular (frontend), ASP.NET Core (backend), n8n (automatisation des workflows), et l'API Groq — LLaMA 3 (intelligence artificielle, 100 % gratuite). Chaque candidature reçue par email est automatiquement collectée par n8n, transmise au backend, analysée par Groq, scorée et classée — permettant au RH de se concentrer uniquement sur la prise de décision. L'architecture est pensée pour une séparation stricte des responsabilités : n8n transporte, le backend orchestre, Groq analyse.
+La plateforme repose sur quatre piliers technologiques : Angular (frontend), Spring Boot (backend), n8n (automatisation des workflows), et l'API Groq — LLaMA 3 (intelligence artificielle, 100 % gratuite). Chaque candidature reçue par email est automatiquement collectée par n8n, transmise au backend, analysée par Groq, scorée et classée — permettant au RH de se concentrer uniquement sur la prise de décision. L'architecture est pensée pour une séparation stricte des responsabilités : n8n transporte, le backend orchestre, Groq analyse.
 Pourquoi ce projet est fort : Il automatise l'intégralité du recrutement, réduit le biais humain grâce à l'IA, combine 4 technologies modernes dans un cas d'usage réel et valorisable, et reste réalisable dans un cadre académique par des étudiants débutants en IA et n8n.
 1.2 Objectifs du projet
 Permettre au RH de créer et gérer des offres d'emploi structurées par domaine.
@@ -94,11 +94,11 @@ Angular
 17+
 Interface utilisateur SPA — tableau de bord RH, formulaires, dashboard Admin
 Backend
-ASP.NET Core Web API
-.NET 8
+Spring Boot Web API
+Java 17+
 API REST — gestion des offres, candidatures, analyse IA, authentification
 Base de données
-SQL Server / PostgreSQL
+MySQL / MariaDB
 2022 / 16
 Stockage des offres, candidatures, analyses et utilisateurs
 Workflow
@@ -110,9 +110,9 @@ Groq (LLaMA 3)
 Tier gratuit
 Analyse CV, scoring (0-100 %), classification par domaine, génération d'emails personnalisés — accès 100 % gratuit pour usage académique
 ORM
-Entity Framework Core
+Spring Data JPA / Hibernate
 8.x
-Accès à la base de données depuis C# sans SQL manuel
+Accès à la base de données depuis Java sans SQL manuel
 Authentification
 JWT Bearer Token
 —
@@ -120,14 +120,14 @@ Sécurisation des accès RH et Admin
 2.2 Justification des choix
 Angular 17+
 Framework frontend de Google, très utilisé en entreprise pour les dashboards et back-offices. Il impose une structure claire avec TypeScript, réduisant les erreurs. Angular Material fournit des composants UI prêts à l'emploi (tableaux, formulaires, onglets, cartes), ce qui accélère considérablement le développement du tableau de bord RH.
-ASP.NET Core 8
-Framework backend Microsoft, performant et structuré. Il permet de créer des API REST propres en C#, avec une intégration native de JWT pour l'authentification et d'Entity Framework Core pour la gestion de la base de données. Son écosystème riche facilite l'intégration de Groq via HttpClient.
-SQL Server / PostgreSQL
-Base de données relationnelle robuste et compatible avec Entity Framework Core. Le schéma relationnel (Offres → Candidatures → Analyses) est naturellement adapté à un modèle SQL, garantissant l'intégrité des données et la cohérence des liens entre entités.
+Spring Boot 3
+Framework backend Microsoft, performant et structuré. Il permet de créer des API REST propres en Java, avec une intégration native de JWT pour l'authentification et d'Spring Data JPA / Hibernate pour la gestion de la base de données. Son écosystème riche facilite l'intégration de Groq via HttpClient.
+MySQL / MariaDB
+Base de données relationnelle robuste et compatible avec Spring Data JPA / Hibernate. Le schéma relationnel (Offres → Candidatures → Analyses) est naturellement adapté à un modèle SQL, garantissant l'intégrité des données et la cohérence des liens entre entités.
 n8n
 Outil d'automatisation visuel open source (self-hosted ou cloud). n8n fonctionne par workflows composés de nœuds connectés graphiquement. Dans ce projet, il joue le rôle d'orchestrateur de données : il surveille la boîte Gmail/IMAP, extrait les pièces jointes PDF, lit leur contenu textuel, envoie les données au backend via HTTP POST, et reçoit des webhooks du backend pour déclencher l'envoi d'emails via Gmail/SMTP. Son interface en glisser-déposer le rend accessible à des débutants sans expérience en code. n8n n'intègre aucune intelligence artificielle et n'appelle jamais l'API Groq — il est exclusivement un transporteur et déclencheur de tâches.
 Groq (LLaMA 3)
-Groq est une plateforme d’inférence IA ultra-rapide qui propose un accès gratuit (via groq.com) aux grands modèles de langage open source, notamment LLaMA 3.3 70B et Mixtral 8x7B. Contrairement à OpenAI (payant dès le premier appel), Groq offre un tier gratuit généreux adapté aux projets académiques : environ 14 400 requêtes par jour sur LLaMA 3. L’API Groq est 100 % compatible avec le format de l’API OpenAI, ce qui permet de l’intégrer dans le backend ASP.NET Core avec un simple changement de base URL (https://api.groq.com/openai/v1) et de clé API. Le modèle reçoit le texte du CV et les exigences du poste, et retourne un JSON structuré contenant le score (0-100 %), le résumé des compétences, la décision suggérée et la classification par domaine. Il génère également le contenu des emails de réponse. Coût : 0 € pour un usage académique dans les limites du tier gratuit.
+Groq est une plateforme d’inférence IA ultra-rapide qui propose un accès gratuit (via groq.com) aux grands modèles de langage open source, notamment LLaMA 3.3 70B et Mixtral 8x7B. Contrairement à OpenAI (payant dès le premier appel), Groq offre un tier gratuit généreux adapté aux projets académiques : environ 14 400 requêtes par jour sur LLaMA 3. L’API Groq est 100 % compatible avec le format de l’API OpenAI, ce qui permet de l’intégrer dans le backend Spring Boot avec un simple changement de base URL (https://api.groq.com/openai/v1) et de clé API. Le modèle reçoit le texte du CV et les exigences du poste, et retourne un JSON structuré contenant le score (0-100 %), le résumé des compétences, la décision suggérée et la classification par domaine. Il génère également le contenu des emails de réponse. Coût : 0 € pour un usage académique dans les limites du tier gratuit.
 3. Fonctionnalités détaillées
 3.1 Authentification et gestion des accès
 Tous les utilisateurs accèdent à la plateforme via une page de connexion sécurisée. Deux rôles distincts sont définis, chacun avec son propre périmètre fonctionnel.
@@ -172,14 +172,14 @@ Les offres sont organisées par catégorie/domaine dans l'interface.
 Le RH peut modifier, désactiver ou supprimer une offre à tout moment.
 Une offre peut avoir trois statuts : Active, Expirée, Désactivée.
 3.3 Collecte automatique des candidatures (n8n)
-Dès qu'un candidat envoie un email à l'adresse RH de l'entreprise, le workflow n8n prend en charge le traitement automatique sans aucune intervention humaine. Il est fondamental de comprendre le rôle précis de n8n dans ce système : n8n n'appelle jamais l'IA directement. n8n joue le rôle d'un facteur intelligent — il collecte les données (emails entrants), les livre au backend, et distribue les réponses (emails sortants). L'analyse par IA est exclusivement effectuée par le backend ASP.NET Core, qui est le seul à communiquer avec l'API Groq.
+Dès qu'un candidat envoie un email à l'adresse RH de l'entreprise, le workflow n8n prend en charge le traitement automatique sans aucune intervention humaine. Il est fondamental de comprendre le rôle précis de n8n dans ce système : n8n n'appelle jamais l'IA directement. n8n joue le rôle d'un facteur intelligent — il collecte les données (emails entrants), les livre au backend, et distribue les réponses (emails sortants). L'analyse par IA est exclusivement effectuée par le backend Spring Boot, qui est le seul à communiquer avec l'API Groq.
 Le trigger IMAP de n8n surveille en permanence la boîte mail de l'entreprise.
 À la réception d'un email, n8n extrait : l'objet de l'email (pour identifier le poste visé), l'adresse email et le nom de l'expéditeur, le fichier PDF joint (CV).
 n8n lit le texte brut du PDF via le nœud intégré de lecture PDF.
 n8n envoie une requête HTTP POST vers le backend avec toutes ces données.
-Règle fondamentale du système — n8n ne touche jamais l'IA. n8n ne fait que transporter des données. Groq est appelé uniquement par le backend ASP.NET Core. Pensez à n8n comme un facteur et à Groq comme un expert : le facteur (n8n) collecte le courrier (emails entrants), le livre au bureau (backend), et envoie les réponses (emails sortants) — il ne sait pas analyser un CV. L'expert (Groq) est dans le bureau (backend) : c'est lui qui analyse, score et rédige. Le bureau (backend) est le chef d'orchestre : il reçoit du facteur, consulte l'expert, range les résultats, et redonne au facteur ce qu'il faut envoyer.
+Règle fondamentale du système — n8n ne touche jamais l'IA. n8n ne fait que transporter des données. Groq est appelé uniquement par le backend Spring Boot. Pensez à n8n comme un facteur et à Groq comme un expert : le facteur (n8n) collecte le courrier (emails entrants), le livre au bureau (backend), et envoie les réponses (emails sortants) — il ne sait pas analyser un CV. L'expert (Groq) est dans le bureau (backend) : c'est lui qui analyse, score et rédige. Le bureau (backend) est le chef d'orchestre : il reçoit du facteur, consulte l'expert, range les résultats, et redonne au facteur ce qu'il faut envoyer.
 3.4 Traitement et stockage des candidatures (Backend)
-À la réception des données envoyées par n8n, le backend ASP.NET Core effectue les opérations suivantes :
+À la réception des données envoyées par n8n, le backend Spring Boot effectue les opérations suivantes :
 Réception et validation des données (email, objet, texte du CV).
 Identification du poste visé en comparant l'objet de l'email aux offres actives en base.
 Création d'un enregistrement Candidature lié à l'offre correspondante.
@@ -397,13 +397,13 @@ Présentation
 Angular 17+
 Afficher les données, formulaires, dashboards, modales. Aucune logique métier.
 API REST
-ASP.NET Core 8
+Spring Boot 3
 Endpoints HTTP, validation, orchestration des services.
 Logique métier
-Services C#
+Services Java
 Analyse IA (Groq), authentification JWT, gestion des offres et candidatures.
 Persistance
-EF Core + SQL Server
+Spring Data JPA / Hibernate + MySQL / MariaDB
 Stockage et récupération des données via ORM.
 Automatisation
 n8n
@@ -526,15 +526,15 @@ TIMESTAMP
 Date de création du compte
 5.3 Structure des dossiers du projet
 SmartEmailHR/
-├── backend/                     ← Projet ASP.NET Core 8
+├── backend/                     ← Projet Spring Boot 3
 │   └── SmartEmailHR.API/
 │       ├── Controllers/         ← Auth, Offres, Candidatures, Stats
 │       ├── Models/              ← Offre, Candidature, AnalyseIA, User
 │       ├── DTOs/                ← Objets de transfert (Request/Response)
 │       ├── Services/            ← GroqService, EmailService, AuthService
-│       ├── Data/                ← AppDbContext (Entity Framework)
-│       ├── appsettings.json     ← Config DB, Groq API Key, JWT
-│       └── Program.cs           ← Point d'entrée, injection de dépendances
+│       ├── Data/                ← Repositories JPA (Spring Data JPA / Hibernate)
+│       ├── application.properties     ← Config DB, Groq API Key, JWT
+│       └── SmartEmailHrApplication.java           ← Point d'entrée, injection de dépendances
 │
 ├── frontend/                    ← Projet Angular 17+
 │   └── src/app/
@@ -732,12 +732,12 @@ PATCH vers /api/candidatures/:id (statut: Refuse, emailReponsEnvoye: true).
 8.1 Contraintes techniques
 L'application doit fonctionner en local (localhost) sans déploiement cloud obligatoire.
 n8n doit être installé en local via Docker ou npm.
-La base de données SQL Server ou PostgreSQL doit être accessible en local ou via un service gratuit.
-La clé API Groq ne doit jamais être exposée côté frontend (stockée dans appsettings.json ou .env, hors Git).
+La base de données MySQL / MariaDB ou MariaDB doit être accessible en local ou via un service gratuit.
+La clé API Groq ne doit jamais être exposée côté frontend (stockée dans application.properties ou .env, hors Git).
 Toutes les données sensibles doivent être dans des fichiers de configuration exclus du versionnement (.gitignore).
 8.2 Contraintes académiques
 Projet réalisable en 5 à 7 semaines par des étudiants de 2ème année d'ingénierie.
-Technologies accessibles : Angular, .NET, n8n et Groq sont tous documentés avec des tutoriels débutants.
+Technologies accessibles : Angular, Spring Boot, n8n et Groq sont documentés avec des tutoriels débutants.
 Code source versionné sur GitHub ou GitLab.
 README.md complet avec instructions de démarrage étape par étape.
 Données de démonstration (offres et candidats fictifs) incluses pour la soutenance.
@@ -755,10 +755,10 @@ Phase
 Tâches principales
 Durée estimée
 Phase 1 — Setup
-Installation : Angular CLI, .NET SDK, SQL Server/PostgreSQL, n8n (Docker). Initialisation Git. Structure des dossiers. Fichiers de configuration (.env, appsettings.json).
+Installation : Angular CLI, JDK 17+ / Maven, MySQL / MariaDB/MariaDB, n8n (Docker). Initialisation Git. Structure des dossiers. Fichiers de configuration (.env, application.properties).
 3-4 jours
 Phase 2 — Backend Core
-Modèles EF Core (Offre, Candidature, AnalyseIA, User). Migrations et création des tables. Endpoints Auth (login, JWT). Endpoints CRUD Offres.
+Modèles Spring Data JPA / Hibernate (Offre, Candidature, AnalyseIA, User). Migrations et création des tables. Endpoints Auth (login, JWT). Endpoints CRUD Offres.
 5-6 jours
 Phase 3 — Intégration IA
 Service Groq (analyse CV + génération email). Endpoint /api/candidatures/recevoir. Tests avec Postman.
@@ -783,10 +783,10 @@ Terme
 Définition
 Angular
 Framework JavaScript/TypeScript de Google pour créer des interfaces web dynamiques (SPA).
-ASP.NET Core
-Framework backend Microsoft pour créer des API REST en C#.
-Entity Framework Core (EF Core)
-ORM qui traduit les classes C# en tables SQL, évitant d'écrire du SQL manuellement.
+Spring Boot
+Framework backend Microsoft pour créer des API REST en Java.
+Spring Data JPA / Hibernate (Spring Data JPA / Hibernate)
+ORM qui traduit les classes Java en tables SQL, évitant d'écrire du SQL manuellement.
 JWT
 JSON Web Token. Jeton chiffré contenant les infos d'un utilisateur connecté, utilisé pour sécuriser les routes.
 n8n
@@ -812,4 +812,4 @@ Mécanisme Angular qui protège les routes de l'application (vérifie si l'utili
 Parsing PDF
 Extraction du texte brut contenu dans un fichier PDF pour permettre son analyse par l'IA.
 SmartEmail HR — Cahier des Charges v2.0
-Projet académique — 2ème Année Ingénierie — Angular │ ASP.NET Core │ n8n │ Groq — Avril 2026
+Projet académique — 2ème Année Ingénierie — Angular │ Spring Boot │ n8n │ Groq — Avril 2026

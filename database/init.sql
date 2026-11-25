@@ -1,4 +1,4 @@
--- SmartEmail HR - Script MySQL / phpMyAdmin compatible Entity Framework Core
+-- SmartEmail HR - Script MySQL / phpMyAdmin compatible
 -- Importez ce fichier dans phpMyAdmin ou executez-le dans l'onglet SQL.
 
 CREATE DATABASE IF NOT EXISTS smartemailhr
